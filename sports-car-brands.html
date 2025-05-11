@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
+      color: #333;
+    }
+    
+    .navbar {
+      background-color: #111;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .logo {
+      color: #e63946;
+      font-size: 1.8rem;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    
+    .nav-links a:hover {
+      color: #e63946;
+    }
+    
+    .page-header {
+      background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/api/placeholder/1200/400') center/cover no-repeat;
+      color: white;
+      padding: 4rem 5%;
+      text-align: center;
+    }
+    
+    .page-header h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .page-header p {
+      max-width: 800px;
+      margin: 0 auto;
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem 5%;
+    }
+    
+    .world-map-container {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      padding: 2rem;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+    
+    .world-map {
+      width: 100%;
+      height: 500px;
+      background: url('/api/placeholder/1200/500') center/contain no-repeat;
+    }
+    
+    .map-overlay {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      background-color: rgba(255,255,255,0.9);
+      padding: 1rem;
+      border-radius: 8px;
+      width: 250px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    
+    .map-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+    
+    .map-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .color-dot {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+    }
+    
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      background-color: white;
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .filter-label {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .filter-select {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    .search-filter {
+      width: 100%;
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .search-filter input {
+      flex: 1;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    .search-filter button {
+      background-color: #e63946;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .section-title {
+      font-size: 2rem;
+      margin: 3rem 0 1.5rem;
+      position: relative;
+      padding-bottom: 0.8rem;
+    }
+    
+    .section-title:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 80px;
+      height: 4px;
+      background-color: #e63946;
+    }
+    
+    .country-flag {
+      height: 24px;
+      width: auto;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+    
+    .region-brands {
+      margin-bottom: 4rem;
+    }
+    
+    .brands-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    
+    .brand-card {
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      transition: transform 0.3s;
+    }
+    
+    .brand-card:hover {
+      transform: translateY(-10px);
+    }
+    
+    .brand-header {
+      display: flex;
+      align-items: center;
+      padding: 1.5rem;
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .brand-logo {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      margin-right: 1rem;
+    }
+    
+    .brand-name {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+    
+    .brand-country {
+      font-size: 0.9rem;
+      color: #666;
+      display: flex;
+      align-items: center;
+      margin-top: 0.3rem;
+    }
+    
+    .brand-country img {
+      height: 16px;
+      margin-right: 0.5rem;
+    }
+    
+    .brand-models {
+      padding: 1.5rem;
+    }
+    
+    .brand-title {
+      font-size: 1.1rem;
+      margin: 0 0 1rem 0;
+    }
+    
+    .models-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    
+    .models-list li {
+      padding: 0.7rem 0;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .models-list li:last-child {
+      border-bottom: none;
+    }
+    
+    .model-badge {
+      background-color: #f1f1f1;
+      padding: 0.3rem 0.6rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      color: #666;
+    }
+    
+    .brand-footer {
+      padding: 1rem 1.5rem;
+      background-color: #f8f9fa;
+      text-align: center;
+      border-top: 1px solid #eee;
+    }
+    
+    .view-all {
+      text-decoration: none;
+      color: #e63946;
+      font-weight: bold;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 3rem;
+    }
+    
+    .page-button {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .page-button:hover {
+      background-color: #f1f1f1;
+    }
+    
+    .page-button.active {
+      background-color: #e63946;
+      color: white;
+      border-color: #e63946;
+    }
+    
+    .featured-brand {
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      margin-bottom: 3rem;
+    }
+    
+    .featured-header {
+      background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/api/placeholder/1200/300') center/cover no-repeat;
+      padding: 3rem;
+      color: white;
+      position: relative;
+    }
+    
+    .featured-label {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background-color: #e63946;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    
+    .featured-logo {
+      width: 100px;
+      margin-bottom: 1rem;
+    }
+    
+    .featured-name {
+      font-size: 2.5rem;
+      margin: 0 0 1rem 0;
+    }
+    
+    .featured-description {
+      max-width: 600px;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    
+    .featured-button {
+      background-color: white;
+      color: #111;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 50px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .featured-button:hover {
+      background-color: #f1f1f1;
+    }
+    
+    .featured-models {
+      padding: 2rem;
+    }
+    
+    .models-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .car-model-card {
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    
+    .car-model-image {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+    
+    .car-model-info {
+      padding: 1rem;
+    }
+    
+    .car-model-name {
+      font-size: 1.2rem;
+      margin: 0 0 0.5rem 0;
+    }
+    
+    .car-model-specs {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    .country-title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    footer {
+      background-color: #111;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      margin-top: 4rem;
+    }
+    
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 1.5rem 0;
+    }
+    
+    .footer-links a {
+      color: white;
+      text-decoration: none;
+    }
+    
+    .footer-links a:hover {
+      color: #e63946;
+    }
+    
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      
+      .map-overlay {
+        position: static;
+        width: 100%;
+        margin-top: 1rem;
+      }
+      
+      .page-header h1 {
+        font-size: 2rem;
+      }
+      
+      .section-title {
+        font-size: 1.8rem;
+      }
+      
+      .featured-header {
+        padding: 2rem;
+      }
+      
+      .featured-name {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="#" class="logo">SupercarSpectrum</a>
+    <div class="nav-links">
+      <a href="#">Home</a>
+      <a href="#" style="color: #e63946;">Brands</a>
+      <a href="#">Compare</a>
+      <a href="#">News</a>
+      <a href="#">Community</a>
+    </div>
+  </nav>
+  
+  <section class="page-header">
+    <h1>Global Sports Car Brands Directory</h1>
+    <p>Explore the world's finest sports car manufacturers and their iconic models</p>
+  </section>
+  
+  <div class="container">
+    <div class="world-map-container">
+      <div class="world-map"></div>
+      <div class="map-overlay">
+        <div class="map-title">Sports Car Heritage</div>
+        <div class="map-legend">
+          <div class="legend-item">
+            <div class="color-dot" style="background-color: #e63946;"></div>
+            <span>Major Production Hubs</span>
+          </div>
+          <div class="legend-item">
+            <div class="color-dot" style="background-color: #f4a261;"></div>
+            <span>Boutique Manufacturers</span>
+          </div>
+          <div class="legend-item">
+            <div class="color-dot" style="background-color: #2a9d8f;"></div>
+            <span>Emerging Markets</span>
+          </div>
+          <div class="legend-item">
+            <div class="color-dot" style="background-color: #457b9d;"></div>
+            <span>Historical Significance</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="filters">
+      <div class="filter-group">
+        <label class="filter-label">Region</label>
+        <select class="filter-select">
+          <option value="all">All Regions</option>
+          <option value="europe">Europe</option>
+          <option value="americas">Americas</option>
+          <option value="asia">Asia & Pacific</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label class="filter-label">Country</label>
+        <select class="filter-select">
+          <option value="all">All Countries</option>
+          <option value="italy">Italy</option>
+          <option value="germany">Germany</option>
+          <option value="uk">United Kingdom</option>
+          <option value="usa">United States</option>
+          <option value="japan">Japan</option>
+          <option value="france">France</option>
+          <option value="sweden">Sweden</option>
+          <option value="other">Other Countries</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label class="filter-label">Specialty</label>
+        <select class="filter-select">
+          <option value="all">All Types</option>
+          <option value="hypercar">Hypercars</option>
+          <option value="supercar">Supercars</option>
+          <option value="electric">Electric Sports Cars</option>
+          <option value="track">Track-Focused</option>
+          <option value="luxury">Luxury Performance</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label class="filter-label">Search</label>
+        <div class="search-filter">
+          <input type="text" placeholder="Search brands...">
+          <button>Find</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="featured-brand">
+      <div class="featured-header">
+        <div class="featured-label">Featured Brand</div>
+        <img src="/api/placeholder/100/60" alt="Ferrari Logo" class="featured-logo">
+        <h2 class="featured-name">Ferrari</h2>
+        <p class="featured-description">
+          Founded in 1939 by Enzo Ferrari, this Italian manufacturer is synonymous with exotic sports cars and Formula 1 racing. Ferrari produces some of the world's most coveted high-performance vehicles, combining cutting-edge technology with unmistakable Italian design.
+        </p>
+        <button class="featured-button">Explore Ferrari</button>
+      </div>
+      
+      <div class="featured-models">
+        <h3>Iconic Models</h3>
+        <div class="models-grid">
+          <div class="car-model-card">
+            <img src="/api/placeholder/250/150" alt="Ferrari SF90 Stradale" class="car-model-image">
+            <div class="car-model-info">
+              <h4 class="car-model-name">SF90 Stradale</h4>
+              <div class="car-model-specs">
+                <span>986 hp</span>
+                <span>Hybrid V8</span>
+                <span>2.5s 0-60</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="car-model-card">
+            <img src="/api/placeholder/250/150" alt="Ferrari 296 GTB" class="car-model-image">
+            <div class="car-model-info">
+              <h4 class="car-model-name">296 GTB</h4>
+              <div class="car-model-specs">
+                <span>819 hp</span>
+                <span>Hybrid V6</span>
+                <span>2.9s 0-60</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="car-model-card">
+            <img src="/api/placeholder/250/150" alt="Ferrari Roma" class="car-model-image">
+            <div class="car-model-info">
+              <h4 class="car-model-name">Roma</h4>
+              <div class="car-model-specs">
+                <span>612 hp</span>
+                <span>Twin-Turbo V8</span>
+                <span>3.4s 0-60</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="car-model-card">
+            <img src="/api/placeholder/250/150" alt="Ferrari Purosangue" class="car-model-image">
+            <div class="car-model-info">
+              <h4 class="car-model-name">Purosangue</h4>
+              <div class="car-model-specs">
+                <span>715 hp</span>
+                <span>V12</span>
+                <span>3.3s 0-60</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="region-brands">
+      <div class="country-title">
+        <img src="/api/placeholder/24/18" alt="Italy Flag" class="country-flag">
+        <h2 class="section-title">Italian Manufacturers</h2>
+      </div>
+      
+      <div class="brands-grid">
+        <div class="brand-card">
+          <div class="brand-header">
+            <img src="/api/placeholder/60/60" alt="Ferrari Logo" class="brand-logo">
+            <div>
+              <h3 class="brand-name">Ferrari</h3>
+              <div class="brand-country">
+                <img src="/api/placeholder/16/12" alt="Italy Flag"> Maranello, Italy
+              </div>
+            </div>
+          </div>
+
+          <div class="brand-models">
+            <h4 class="brand-title">Key Models</h4>
+            <ul class="models-list">
+              <li>
+                <span>SF90 Stradale</span>
+                <span class="model-badge">Hybrid</span>
+                <p>Performance: 986 hp, Hybrid V8, 0-60 mph in 2.5s</p>
+                <p>Price: Starting at $625,000</p>
+                <p>Description: Ferrari's first plug-in hybrid supercar, combining cutting-edge technology with breathtaking performance.</p>
+              </li>
+              <li>
+                <span>296 GTB</span>
+                <span class="model-badge">Hybrid</span>
+                <p>Performance: 819 hp, Hybrid V6, 0-60 mph in 2.9s</p>
+                <p>Price: Starting at $320,000</p>
+                <p>Description: A compact and agile hybrid sports car with a focus on driving pleasure and efficiency.</p>
+              </li>
+              <li>
+                <span>Roma</span>
+                <span class="model-badge">Grand Tourer</span>
+                <p>Performance: 612 hp, Twin-Turbo V8, 0-60 mph in 3.4s</p>
+                <p>Price: Starting at $243,000</p>
+                <p>Description: A sleek and elegant grand tourer that embodies Ferrari's timeless design and luxury.</p>
+              </li>
+              <li>
+                <span>Purosangue</span>
+                <span class="model-badge">SUV</span>
+                <p>Performance: 715 hp, V12, 0-60 mph in 3.3s</p>
+                <p>Price: Starting at $400,000</p>
+                <p>Description: Ferrari's first-ever SUV, blending performance and practicality with a naturally aspirated V12 engine.</p>
+              </li>
+            </ul>
+          </div>
+
+          <div class="brand-footer">
+            <a href="#" class="view-all">View All Ferrari Models →</a>
+          </div>
+        </div>
+        
+        <div class="brand-card">
+          <div class="brand-header">
+            <img src="/api/placeholder/60/60" alt="Lamborghini Logo" class="brand-logo">
+            <div>
+              <h3 class="brand-name">Lamborghini</h3>
+              <div class="brand-country">
+                <img src="/api/placeholder/16/12" alt="Italy Flag"> Sant'Agata Bolognese, Italy
+              </div>
+            </div>
+          </div>
+
+          <div class="brand-models">
+            <h4 class="brand-title">Key Models</h4>
+            <ul class="models-list">
+              <li>
+                <span>Aventador</span>
+                <span class="model-badge">V12</span>
+                <p>Performance: 769 hp, V12, 0-60 mph in 2.8s</p>
+                <p>Price: Starting at $500,000</p>
+                <p>Description: Lamborghini's flagship supercar with a naturally aspirated V12 engine and iconic scissor doors.</p>
+              </li>
+              <li>
+                <span>Huracán</span>
+                <span class="model-badge">V10</span>
+                <p>Performance: 631 hp, V10, 0-60 mph in 2.9s</p>
+                <p>Price: Starting at $250,000</p>
+                <p>Description: A versatile and high-performance V10 supercar available in coupe and convertible variants.</p>
+              </li>
+              <li>
+                <span>Revuelto</span>
+                <span class="model-badge">Hybrid V12</span>
+                <p>Performance: 1,001 hp, Hybrid V12, 0-60 mph in 2.5s</p>
+                <p>Price: Starting at $600,000</p>
+                <p>Description: Lamborghini's first hybrid supercar, combining electrification with raw V12 power.</p>
+              </li>
+              <li>
+                <span>Urus</span>
+                <span class="model-badge">SUV</span>
+                <p>Performance: 641 hp, Twin-Turbo V8, 0-60 mph in 3.6s</p>
+                <p>Price: Starting at $230,000</p>
+                <p>Description: A high-performance luxury SUV that redefines practicality and speed.</p>
+              </li>
+            </ul>
+          </div>
+
+          <div class="brand-footer">
+            <a href="#" class="view-all">View All Lamborghini Models →</a>
+          </div>
+        </div>
+        
+        <div class="brand-card">
+          <div class="brand-header">
+            <img src="/api/placeholder/60/60" alt="Maserati Logo" class="brand-logo">
+            <div>
+              <h3 class="brand-name">Maserati</h3>
+              <div class="brand-country">
+                <img src="/api/placeholder/16/12" alt="Italy Flag"> Modena, Italy
+              </div>
+            </div>
+          </div>
+          
+          <div class="brand-models">
+            <h4 class="brand-title">Key Models</h4>
+            <ul class="models-list">
+              <li>
+                <span>MC20</span>
+                <span class="model-badge">Supercar</span>
+              </li>
+              <li>
+                <span>GranTurismo</span>
+                <span class="model-badge">Grand Tourer</span>
+              </li>
+              <li>
+                <span>Grecale</span>
+                <span class="model-badge">SUV</span>
+              </li>
+              <li>
+                <span>Ghibli</span>
+                <span class="model-badge">Sports Sedan</span>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="brand-footer">
+            <a href="#" class="view-all">View All Maserati Models →</a>
+          </div>
+        </div>
+        
+        <div class="brand-card">
+          <div class="brand-header">
+            <img src="/api/placeholder/60/60" alt="Pagani Logo" class="brand-logo">
+            <div>
+              <h3 class="brand-name">Pagani</h3>
+              <div class="brand-country">
+                <img src="/api/placeholder/16/12" alt="Italy Flag"> San Cesario sul Panaro, Italy
+              </div>
+            </div>
+          </div>
+          
+          <div class="brand-models">
+            <h4 class="brand-title">Key Models</h4>
+            <ul class="models-list">
+              <li>
+                <span>Utopia</span>
+                <span class="model-badge">Hypercar</span>
+              </li>
+              <li>
+                <span>Huayra</span>
+                <span class="model-badge">Hypercar</span>
+              </li>
+              <li>
+                <span>Huayra Roadster</span>
+                <span class="model-badge">Convertible</span>
+              </li>
+              <li>
+                <span>Zonda (Legacy)</span>
+                <span class="model-badge">Hypercar</span>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="brand-footer">
+            <a href="#" class="view-all">View All Pagani Models →</a>
+          </div>
+        </div>
+        
+        <div class="brand-card">
+          <div class="brand-header">
+            <img src="/api/placeholder/60/60" alt="Alfa Romeo Logo" class="brand-logo">
+            <div>
+              <h3 class="brand-name">Alfa Romeo</h3>
+              <div class="brand-country">
+                <img src="/api/placeholder/16/12" alt="Italy Flag"> Turin, Italy
+              </div>
+            </div>
+          </div>
+          
+          <div class="brand-models">
+            <h4 class="brand-title">Key Models</h4>
+            <ul class="models-list">
+              <li>
+                <span>4C</span>
+                <span class="model-badge">Sports Car</span>
+              </li>
+              <li>
+                <span>Giulia Quadrifoglio</span>
+                <span class="model-badge">Sports Sedan</span>
+              </li>
+              <li>
+                <span>8C Competizione</span>
+                <span class="model-badge">Legacy</span>
+              </li>
+              <li>
+                <span>33 Stradale</span>
+                <span class="model-badge">Limited Edition</span>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="brand-footer">
+            <a href="#" class="view-all">View All Alfa Romeo Models →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="region-brands">
+      <div class="country-title">
+        <img src="/api/placeholder/24/18" alt="Germany Flag" class="country-flag">
+        <h2 class="section-title">German Manufacturers</h2>
+      </div>
+      
+      <div class="brands-grid">
+        <div class="brand-card">
+          <div class="brand-header">
+            <img src="/api/placeholder/60/60" alt="Porsche Logo" class="brand-logo">
+            <div>
+              <h3 class="brand-name">Porsche</h3>
+              <div class="brand-country">
+                <img src="/api/placeholder/16/12" alt="Germany Flag"> Stuttgart, Germany
+              </div>
+            </div>
+          </div>
+          
+          <div class="brand-models">
+            <h4 class="brand-title">Key Models</h4>
+            <ul class="models-list">
+              <li>
+                <span>911</span>
+                <span class="model-badge">Iconic</span>
+              </li>
+              <li>
+                <span>718 Cayman/Boxster</span>
+                <span class="model-badge">Mid-Engine</span>
+              </li>
+              <li>
+                <span>Taycan</span>
+                <span class="model-badge">Electric</span>
+              </li>
+              <li>
+                <span>918 Spyder</span>
+                <span class="model-badge">Hybrid</span>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="brand-footer">
+            <a href="#" class="view-all">View All Porsche Models →</a>
+          </div>
+        </div>
+        
+        <div class="brand-card">
+          <div class="brand-header">
+            <img src="/api/placeholder/60/60" alt="BMW M Logo" class="brand-logo">
+            <div>
+              <h3 class="brand-name">BMW M</h3>
+              <div class="brand-country">
+                <img src="/api/placeholder/16/12" alt="Germany Flag"> Munich, Germany
+              </div>
+            </div>
+          </div>
+          
+          <div class="brand-models">
+            <h4 class="brand-title">Key Models</h4>
+            <ul class="models-list">
+              <li>
+                <span>M2</span>
+                <span class="model-badge">Compact</span>
+              </li>
+              <li>
+                <span>M3/M4</span>
+                <span class="model-badge">Performance</span>
+              </li>
+              <li>
+                <span>M5 CS</span>
+                <span class="model-badge">Super Sedan</span>
+              </li>
+              <li>
+                <span>M8 Competition</span>
+                <span class="model-badge">Grand Tourer</span>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="brand-footer">
+            <a href="#" class="view-all">View All BMW M Models →</a>
+          </div>
+        </div>
+        
+        <div class="brand-card">
+          <div class="brand-header">
+            <img src="/api/placeholder/60/60" alt="Mercedes-AM
